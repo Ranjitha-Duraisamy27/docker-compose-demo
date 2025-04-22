@@ -1,0 +1,10 @@
+<div class="container">
+  <h1 class="text-center">Todos List</h1>
+  <ul class="list-group">
+    @for (item of todos; track item.name) {
+    <li class="list-group-item">{{ item.name }}</li>
+    } @empty {
+    <li class="list-group-item">There are no items.</li>
+    }
+  </ul>
+</div>
