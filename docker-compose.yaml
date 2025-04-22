@@ -1,0 +1,56 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - mongo-network
+    volumes:
+      - mongo-data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin123
+    networks:
+      - mongo-network
+    depends_on:
+      - mongo
+
+  backend:
+    build: ./backend
+    container_name: node-app
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/tododb
+    depends_on:
+      - mongo
+    networks:
+      - mongo-network
+
+  frontend:
+    build: ./frontend
+    container_name: angular-app
+    ports:
+      - "4200:4200"
+    networks:
+      - mongo-network
+
+networks:
+  mongo-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
